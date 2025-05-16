@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <title>UPN QR Generator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/polyfills.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    #qrcode {
+      margin-top: 2em;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6SF8W94XHW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6SF8W94XHW');
+</script>
+
+<body class="section">
+  <div class="container">
+    <h1 class="title is-3">Brezplačno ustvarite UPN QR za hitro plačilo računov brez QR kode</h1>
+    <div class="box"><p>Ste prejeli račun brez QR kode, kot je to pogosto pri dokumentih Finančne uprave Republike Slovenije (FURS)? Na primer pri davku na nepremičnine, nadomestilu za uporabo stavbnega zemljišča ali drugih davčnih in občinskih položnicah? Tudi številna podjetja na svojih računih še vedno ne vključujejo QR kode. Z našim brezplačnim spletnim orodjem lahko hitro ustvarite UPN QR kodo, ki jo nato skenirate z mobilno banko ali uporabite za plačilo na bankomatu ali v trafiki 3DVA.</p><p>UPN QR koda vsebuje vse potrebne podatke za plačilo, kot so IBAN prejemnika, znesek, namen in referenca. Če ste želeli plačati na bankomatu ali v trafiki, pa niste imeli QR kode, lahko zdaj to storite brez težav. Vaši podatki ostanejo popolnoma zasebni – vse se zgodi neposredno v vašem brskalniku, brez pošiljanja podatkov na strežnik. Orodje ne shranjuje in ne zbira nobenih osebnih informacij. Ustvarjeni plačilni nalog s QR kodo se shrani le na vaši napravi.</div>
+
+<form id="qrForm">
+    <div class="columns is-multiline">
+      <div class="column is-half">
+        <div class="field">
+          <label class="label">Ime plačnika (Kdo plačuje?) *</label>
+          <div class="control">
+            <input class="input required" id="ime_placnika" required maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Ulica plačnika *</label>
+          <div class="control">
+            <input class="input" id="ulica_placnika" required maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Kraj plačnika *</label>
+          <div class="control">
+            <input class="input" id="kraj_placnika" required maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">IBAN plačnika *</label>
+          <div class="control">
+            <input class="input required" id="IBAN_placnika" required maxlength="36">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Referenca plačnika</label>
+          <div class="control">
+            <input class="input" id="referenca_placnika" maxlength="40" placeholder="Pusti prazno">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Znesek (€) *</label>
+          <div class="control">
+            <input class="input required" id="znesek" type="number" step="0.01" required maxlength="7">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Koda namena (4 črke, npr. OTHR) *</label>
+          <div class="control">
+            <input class="input required" id="koda_namena" maxlength="4" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Namen plačila</label>
+          <div class="control">
+            <input class="input" id="namen_placila" maxlength="40">
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-half"><!--- prejemnik part --->
+
+        <div class="field">
+          <label class="label">Ime prejemnika (Komu plačujemo?) *</label>
+          <div class="control">
+            <input class="input required" id="ime_prejemnika" required maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Ulica prejemnika</label>
+          <div class="control">
+            <input class="input" id="ulica_prejemnika" maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Kraj prejemnika</label>
+          <div class="control">
+            <input class="input" id="kraj_prejemnika" maxlength="40">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">IBAN prejemnika *</label>
+          <div class="control">
+            <input class="input required" id="IBAN_prejemnika" required maxlength="36">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Referenca prejemnika (sklic) *</label>
+          <div class="control">
+            <input class="input required" id="referenca_prejemnika" required maxlength="40">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="field mt-4">
+      <div class="control">
+        <button type="button" class="button is-primary" onclick="validateAndGenerateAndDownload()">Shrani QR plačilo</button>
+      </div>
+    </div>
+
+<p>Pritisnite gumb za prenos UPN naloga v svojo napravo. Shranen dokument lahko plačate kjerkoli – enako kot položnico (z bankomatom, v trafike 3DVA ali z mobilno banko.</p>
+
+<script>
+function validateAndGenerateAndDownload() {
+  const form = document.getElementById("qrForm");
+  if (!form.checkValidity()) {
+    form.reportValidity(); 
+    return;
+  }
+  generate(); 
+  downloadPDF(); 
+}
+</script>
+</form>
+
+<canvas id="qrcode"></canvas>
+</div>
+
+<!-- Encode and download PDF --->
+<script src="./upnencode.js"></script>
+<script type="module" src="./downloadpdf.js"></script>
+
+<!---
+<div class="box mt-5">
+  <h2 class="title is-5">Testni vnos celotnega UPN</h2>
+  <div class="field">
+    <label class="label">Vnesi JS objekt kot tekst (npr. iz konzole)</label>
+    <div class="control">
+      <textarea class="textarea" id="test_upn_input" rows="8" placeholder="{ ime_placnika: 'Janez Novak', ... }"></textarea>
+    </div>
+  </div>
+  <div class="field">
+    <button class="button is-info" onclick="loadTestUPN()">Naloži testni UPN</button>
+  </div>
+</div>
+
+<script>
+  function loadTestUPN() {
+    const input = document.getElementById('test_upn_input').value;
+    try {
+      // Convert to JSON-style (quote keys) for evaluation
+      const fixed = input
+        .replace(/(\w+):/g, '"$1":')       // add quotes to keys
+        .replace(/new Date\(\)/g, `"${new Date().toISOString().split('T')[0]}"`); // handle date
+
+      const data = JSON.parse(fixed);
+
+      const fill = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined) el.value = val;
+      };
+
+      fill('ime_placnika', data.ime_placnika);
+      fill('ulica_placnika', data.ulica_placnika);
+      fill('kraj_placnika', data.kraj_placnika);
+      fill('IBAN_placnika', data.IBAN_placnika);
+      fill('referenca_placnika', data.referenca_placnika);
+      fill('znesek', data.znesek);
+      fill('koda_namena', data.koda_namena);
+      fill('namen_placila', data.namen_placila);
+      fill('IBAN_prejemnika', data.IBAN_prejemnika);
+      fill('referenca_prejemnika', data.referenca_prejemnika);
+      fill('ime_prejemnika', data.ime_prejemnika);
+      fill('ulica_prejemnika', data.ulica_prejemnika);
+      fill('kraj_prejemnika', data.kraj_prejemnika);
+
+    } catch (e) {
+      alert('Napaka pri branju objekta: ' + e.message);
+    }
+  }
+</script>
+--->
+
+</body>
+</html>
+
+
